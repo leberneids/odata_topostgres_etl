@@ -15,8 +15,7 @@ default_args = {
     'owner': 'lluis',
     'depends_on_past': False,
     'start_date': datetime(2024, 1, 1),
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5),
+    'catchup': False,
 }
 
 
@@ -35,7 +34,7 @@ levels = [
 ]
 
 def extract_function(ti, url, level):
-    azure_devops_conn_id = 'devops'
+    azure_devops_conn_id = 'azure_devops'
     azure_devops_conn = BaseHook.get_connection(azure_devops_conn_id)
     user = azure_devops_conn.login
     password = azure_devops_conn.password
@@ -51,11 +50,11 @@ def extract_function(ti, url, level):
     return df, tbl_name
 
 def load_to_db(ti, level):
-    postgres_external_conn_id = 'Postgres_external'
+    postgres_external_conn_id = 'postgres_external'
     postgres_conn = BaseHook.get_connection(postgres_external_conn_id)
     user = postgres_conn.login
     password = postgres_conn.password
-    database = postgres_conn.database
+    database = 'Azuredevops'
     # Retrieve the DataFrame from XCom
     tbl_name = ti.xcom_pull(key=f'level_{level}_tablename')
     df = ti.xcom_pull(key=f'level_{level}_dataframe')
